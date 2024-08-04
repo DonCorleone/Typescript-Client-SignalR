@@ -10,7 +10,7 @@ export class SignalRService {
 
   constructor() {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('http://localhost:5263/hub', {
+      .withUrl('https://laundrysignalr-init.onrender.com/hub', {
         withCredentials: true
       })
       .build();
@@ -21,7 +21,7 @@ export class SignalRService {
       .then(() => console.log('Connection started'))
       .catch(err => console.log('Error while starting connection: ' + err));
   }
-  public addTransferChartDataListener() {
+  public addDataListener() {
     this.hubConnection.on('messageReceived', (user, message) => {
       console.log(`User: ${user}, Message: ${message}`);
       this.messages.update(messages => [...messages, message]);

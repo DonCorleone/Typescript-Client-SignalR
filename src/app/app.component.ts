@@ -19,7 +19,7 @@ export class AppComponent implements OnInit{
   constructor(private signalRService: SignalRService) {}
   ngOnInit() {
       this.signalRService.startConnection();
-      this.signalRService.addTransferChartDataListener();
+      this.signalRService.addDataListener();
 
       this.messages = this.signalRService.getMessages(); // Use the signal from the service
   }
