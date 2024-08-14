@@ -42,7 +42,7 @@ export class SignalRService {
       (reservationId: number) => {
         console.log(`Reservation with id: ${reservationId} has been deleted`);
         this.reservationEntries.update((reservationEntries) =>
-          reservationEntries.filter((entry) => new Date(entry.timestamp).valueOf() !== reservationId)
+          reservationEntries.filter((entry) => entry.id !== reservationId)
         );
       }
     );
@@ -64,8 +64,7 @@ export class SignalRService {
 
   public deleteReservation(reservationEntry: ReservationEntry) {
 
-    const id = new Date(reservationEntry.timestamp).valueOf()
-    this.httpClient.delete('http://localhost:5263/api/ReservationEntries?reservationId=' + id).subscribe(reservationId => {
+    this.httpClient.delete('http://localhost:5263/api/ReservationEntries?reservationId=' + reservationEntry.id).subscribe(reservationId => {
       console.log('Deleted reservation:', reservationId);
     });
   }

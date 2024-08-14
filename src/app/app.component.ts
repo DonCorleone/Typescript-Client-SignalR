@@ -25,10 +25,11 @@ export class AppComponent implements OnInit {
     this.reservationEntries = this.signalRService.getMessages(); // Use the signal from the service
   }
   addReservation() {
+    const timestamp = new Date();
     this.signalRService.addReservation({
-      id: this.reservationEntries.length + 1,
+      id: new Date(timestamp).valueOf(),
       name: this.user,
-      timestamp: new Date(),
+      timestamp: timestamp,
       tags: [],
     });
     this.user = '';
