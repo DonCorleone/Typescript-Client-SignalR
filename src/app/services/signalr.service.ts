@@ -2,6 +2,7 @@
 import { Injectable, signal } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { ReservationEntry } from '../models/reservation-entry';
+import { HttpClient, HttpRequest } from '@angular/common/http';
 @Injectable({
   providedIn: 'root',
 })
@@ -9,7 +10,7 @@ export class SignalRService {
   private hubConnection: signalR.HubConnection;
   private reservationEntries = signal<ReservationEntry[]>([]); // Signal to store messages
 
-  constructor() {
+  constructor(private httpClient: HttpClient) {
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl('http://localhost:5263/hub', {
         withCredentials: true,
@@ -24,7 +25,7 @@ export class SignalRService {
   }
   public addDataListener() {
     this.hubConnection.on(
-      'messageReceived',
+      'ReservationAdded',
       (reservationEntry: ReservationEntry) => {
         console.log(
           `User: ${reservationEntry.name}, Time: ${reservationEntry.timestamp}`
@@ -36,13 +37,34 @@ export class SignalRService {
         // expose the message to the UI
       }
     );
+    this.hubConnection.on(
+      'ReservationDeleted',
+      (reservationId: number) => {
+        console.log(`Reservation with id: ${reservationId} has been deleted`);
+        this.reservationEntries.update((reservationEntries) =>
+          reservationEntries.filter((entry) => entry.id !== reservationId)
+        );
+      }
+    );
   }
+
   getMessages() {
     return this.reservationEntries.asReadonly(); // Expose messages as a readonly signal
   }
-  public sendMessage(reservationEntry: ReservationEntry) {
-    this.hubConnection
-      .invoke('newMessage', reservationEntry)
-      .catch((err) => console.error(err));
+  public addReservation(reservationEntry: ReservationEntry) {
+
+    this.httpClient.post<ReservationEntry>('http://localhost:5263/api/ReservationEntries', reservationEntry).subscribe(reservation => {
+      console.log('Updated reservation:', reservation);
+    });
+
+    // this.hubConnection
+    //   .invoke('newMessage', reservationEntry)
+    //   .catch((err) => console.error(err));
+  }
+
+  public deleteReservation(reservationEntry: ReservationEntry) {
+    this.httpClient.delete('http://localhost:5263/api/ReservationEntries?reservationId=' + reservationEntry.id).subscribe(reservationId => {
+      console.log('Deleted reservation:', reservationId);
+    });
   }
 }

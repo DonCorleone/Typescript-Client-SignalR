@@ -13,6 +13,7 @@ import { ReservationEntry } from './models/reservation-entry';
   styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
+
   user: string = '';
   reservationEntries!: Signal<ReservationEntry[]>; // Signal to store messages
 
@@ -23,13 +24,16 @@ export class AppComponent implements OnInit {
 
     this.reservationEntries = this.signalRService.getMessages(); // Use the signal from the service
   }
-  sendMessage() {
-    this.signalRService.sendMessage({
+  addReservation() {
+    this.signalRService.addReservation({
       id: this.reservationEntries.length + 1,
       name: this.user,
       timestamp: new Date(),
       tags: [],
     });
     this.user = '';
+  }
+  deleteReservation(reservation: ReservationEntry) {
+    this.signalRService.deleteReservation(reservation);
   }
 }
