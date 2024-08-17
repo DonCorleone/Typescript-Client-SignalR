@@ -6,7 +6,7 @@
   <h2>Reservations</h2>
   <ul>
     @for(reservation of reservationEntries(); track reservation.timestamp) {
-      <li>{{ reservation.name }} : {{ reservation.timestamp }}
+      <li>{{ reservation.name }} : {{ reservation.id }}
         <button (click)="deleteReservation(reservation)">Delete</button>
       </li>
     }

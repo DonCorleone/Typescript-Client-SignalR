@@ -27,14 +27,33 @@ export class AppComponent implements OnInit {
   addReservation() {
     const timestamp = new Date();
     this.signalRService.addReservation({
-      id: new Date(timestamp).valueOf(),
+      id: this.calculateNumberFromDate(timestamp),
       name: this.user,
       timestamp: timestamp,
-      tags: [],
+      tags: ["Machine 1"],
     });
     this.user = '';
   }
   deleteReservation(reservation: ReservationEntry) {
     this.signalRService.deleteReservation(reservation);
   }
+    // New function to calculate a number based on date and time
+    public calculateNumberFromDate(date: Date): number {
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1; // Months are zero-based in JavaScript
+      const day = date.getDate();
+      let hour = date.getHours();
+      // for test cases, generate a random number between 0 and 24
+      hour = Math.floor(Math.random() * 24);
+
+
+      let minute = date.getMinutes();
+      // for test cases, generate a random number between 0 and 59
+      minute = Math.floor(Math.random() * 59);
+
+      // Example formula: weighted sum of components
+      const calculatedNumber = year * 100000000 + month * 1000000 + day * 10000 + hour * 100 + minute;
+  
+      return calculatedNumber;
+    }
 }

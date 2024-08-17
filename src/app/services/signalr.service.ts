@@ -9,10 +9,17 @@ import { HttpClient, HttpRequest } from '@angular/common/http';
 export class SignalRService {
   private hubConnection: signalR.HubConnection;
   private reservationEntries = signal<ReservationEntry[]>([]); // Signal to store messages
+  private baseUrlLocal = 'http://localhost:5263';
+  private baseUrlRender = 'https://laundrysignalr-init.onrender.com/api/ReservationEntries';
 
   constructor(private httpClient: HttpClient) {
+    // Add custom parameters to the connection URL
+    const customParams = {
+      machineid: 'Machine 1',
+    };
+    const queryString = new URLSearchParams(customParams).toString();
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('http://localhost:5263/hub', {
+      .withUrl(`${this.baseUrlLocal}/hub?${queryString}`, {
         withCredentials: true,
       })
       .build();
@@ -46,6 +53,13 @@ export class SignalRService {
         );
       }
     );
+    this.hubConnection.on(
+      'ReservationsLoaded',
+      (reservations: ReservationEntry[]) => {
+        console.log(`reservations loded`);
+        this.reservationEntries.update((reservationEntries) => (reservationEntries) = reservations);
+      }
+    );
   }
 
   getMessages() {
@@ -53,7 +67,7 @@ export class SignalRService {
   }
   public addReservation(reservationEntry: ReservationEntry) {
 
-    this.httpClient.post<ReservationEntry>('http://localhost:5263/api/ReservationEntries', reservationEntry).subscribe(reservation => {
+    this.httpClient.post<ReservationEntry>(`${this.baseUrlLocal}api/ReservationEntries`, reservationEntry).subscribe(reservation => {
       console.log('Updated reservation:', reservation);
     });
 
@@ -64,7 +78,11 @@ export class SignalRService {
 
   public deleteReservation(reservationEntry: ReservationEntry) {
 
-    this.httpClient.delete('http://localhost:5263/api/ReservationEntries?reservationId=' + reservationEntry.id).subscribe(reservationId => {
+    // call the API to delete the reservation with the reservation as http body
+    const options = {
+      body: reservationEntry,
+    };
+    this.httpClient.delete<ReservationEntry>(`${this.baseUrlLocal}/api/ReservationEntries`, options).subscribe(reservationId => {
       console.log('Deleted reservation:', reservationId);
     });
   }
