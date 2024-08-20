@@ -67,7 +67,7 @@ export class SignalRService {
   }
   public addReservation(reservationEntry: ReservationEntry) {
 
-    this.httpClient.post<ReservationEntry>(`${this.baseUrlLocal}api/ReservationEntries`, reservationEntry).subscribe(reservation => {
+    this.httpClient.post<ReservationEntry>(`${this.baseUrlLocal}/api/ReservationEntries`, reservationEntry).subscribe(reservation => {
       console.log('Updated reservation:', reservation);
     });
 
